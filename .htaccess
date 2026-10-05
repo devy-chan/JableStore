@@ -1,0 +1,9 @@
+Options -Indexes
+
+# Protect Git metadata if the folder is ever uploaded accidentally.
+RedirectMatch 404 /\.git
+
+# Disable access to common local/config files.
+<FilesMatch "^(\.env|\.gitignore|composer\.(json|lock)|.*\.sql|.*\.bak|.*\.log)$">
+    Require all denied
+</FilesMatch>

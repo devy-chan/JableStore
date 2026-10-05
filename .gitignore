@@ -22,3 +22,5 @@ Thumbs.db
 
 # Node dependencies if used
 /node_modules/
+# JableStore local/production database credentials
+backend/config/db_connect.local.php

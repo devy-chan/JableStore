@@ -1,28 +1,43 @@
-<?php 	
+<?php
 
 require_once __DIR__ . '/../config/core.php';
 
-$valid['success'] = array('success' => false, 'messages' => array());
+$valid = array('success' => false, 'messages' => '');
 
-if($_POST) {
-	$edituserName = $_POST['edituserName'];
-	$editPassword 		= md5($_POST['editPassword']);
-	$userid 		= $_POST['userid'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $edituserName = trim($_POST['edituserName'] ?? '');
+    $editPassword = $_POST['editPassword'] ?? '';
+    $userid = filter_input(INPUT_POST, 'userid', FILTER_VALIDATE_INT);
 
-				
-	$sql = "UPDATE users SET username = '$edituserName', password = '$editPassword' WHERE user_id = $userid ";
+    if ($edituserName === '' || !$userid) {
+        $valid['messages'] = 'Username and user ID are required.';
+    } else {
+        if ($editPassword !== '') {
+            $passwordHash = password_hash($editPassword, PASSWORD_DEFAULT);
+            $stmt = $connect->prepare('UPDATE users SET username = ?, password = ? WHERE user_id = ?');
+            if ($stmt) {
+                $stmt->bind_param('ssi', $edituserName, $passwordHash, $userid);
+            }
+        } else {
+            $stmt = $connect->prepare('UPDATE users SET username = ? WHERE user_id = ?');
+            if ($stmt) {
+                $stmt->bind_param('si', $edituserName, $userid);
+            }
+        }
 
-	if($connect->query($sql) === TRUE) {
-		$valid['success'] = true;
-		$valid['messages'] = "Successfully Update";	
-	} else {
-		$valid['success'] = false;
-		$valid['messages'] = "Error while updating product info";
-	}
+        if (isset($stmt) && $stmt) {
+            if ($stmt->execute()) {
+                $valid['success'] = true;
+                $valid['messages'] = 'Successfully Updated';
+            } else {
+                $valid['messages'] = 'Error while updating user information.';
+            }
+            $stmt->close();
+        } else {
+            $valid['messages'] = 'Unable to prepare the database request.';
+        }
+    }
+}
 
-} // /$_POST
-	 
 $connect->close();
-
 echo json_encode($valid);
- 
