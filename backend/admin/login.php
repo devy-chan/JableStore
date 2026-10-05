@@ -9,67 +9,47 @@ if(isset($_SESSION['userId'])) {
 
 $errors = array();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
+if($_POST) {		
 
-    if ($username === '' || $password === '') {
-        if ($username === '') {
-            $errors[] = 'Username is required';
-        }
-        if ($password === '') {
-            $errors[] = 'Password is required';
-        }
-    } else {
-        $stmt = $connect->prepare('SELECT user_id, username, password FROM users WHERE username = ? LIMIT 1');
+	$username = $_POST['username'];
+	$password = $_POST['password'];
 
-        if ($stmt) {
-            $stmt->bind_param('s', $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $user = $result->fetch_assoc();
-            $stmt->close();
+	if(empty($username) || empty($password)) {
+		if($username == "") {
+			$errors[] = "Username is required";
+		} 
 
-            $validPassword = false;
-            $needsRehash = false;
+		if($password == "") {
+			$errors[] = "Password is required";
+		}
+	} else {
+		$sql = "SELECT * FROM users WHERE username = '$username'";
+		$result = $connect->query($sql);
 
-            if ($user) {
-                // Support existing MD5 passwords during migration, then upgrade
-                // the password to password_hash() after a successful login.
-                if (password_verify($password, $user['password'])) {
-                    $validPassword = true;
-                    $needsRehash = password_needs_rehash($user['password'], PASSWORD_DEFAULT);
-                } elseif (hash_equals($user['password'], md5($password))) {
-                    $validPassword = true;
-                    $needsRehash = true;
-                }
-            }
+		if($result->num_rows == 1) {
+			$password = md5($password);
+			// exists
+			$mainSql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+			$mainResult = $connect->query($mainSql);
 
-            if ($user && $validPassword) {
-                if ($needsRehash) {
-                    $newHash = password_hash($password, PASSWORD_DEFAULT);
-                    $update = $connect->prepare('UPDATE users SET password = ? WHERE user_id = ?');
-                    if ($update) {
-                        $update->bind_param('si', $newHash, $user['user_id']);
-                        $update->execute();
-                        $update->close();
-                    }
-                }
+			if($mainResult->num_rows == 1) {
+				$value = $mainResult->fetch_assoc();
+				$user_id = $value['user_id'];
 
-                session_regenerate_id(true);
-                $_SESSION['userId'] = $user['user_id'];
+				// set session
+				$_SESSION['userId'] = $user_id;
 
-                header('location:' . $store_url . 'backend/admin/dashboard.php');
-                exit;
-            }
-
-            $errors[] = 'Incorrect username/password combination';
-        } else {
-            $errors[] = 'Unable to process login. Please try again later.';
-        }
-    }
-}
-
+				header('location:'.$store_url.'backend/admin/dashboard.php');	
+			} else{
+				
+				$errors[] = "Incorrect username/password combination";
+			} // /else
+		} else {		
+			$errors[] = "Username doesnot exists";		
+		} // /else
+	} // /else not empty username // password
+	
+} // /if $_POST
 ?>
 
 <!DOCTYPE html>

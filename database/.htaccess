@@ -1,1 +1,4 @@
-Require all denied
+# Do not allow visitors to download SQL/database files.
+<FilesMatch "\.(sql|sqlite|db)$">
+    Require all denied
+</FilesMatch>

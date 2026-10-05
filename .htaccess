@@ -1,9 +1,7 @@
+# JABLE STORE - basic Apache security rules
 Options -Indexes
 
-# Protect Git metadata if the folder is ever uploaded accidentally.
-RedirectMatch 404 /\.git
-
-# Disable access to common local/config files.
-<FilesMatch "^(\.env|\.gitignore|composer\.(json|lock)|.*\.sql|.*\.bak|.*\.log)$">
+# Block common project/development files from being downloaded.
+<FilesMatch "^(\.env|\.gitignore|PROJECT_STRUCTURE\.txt|DATATABLES_AJAX_FIX\.txt)$">
     Require all denied
 </FilesMatch>
