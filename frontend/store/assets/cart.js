@@ -1,0 +1,27 @@
+async function syncCartImages(){
+ try{
+  const r=await fetch('../../backend/actions/storeProducts.php');
+  const d=await r.json();
+  const byId=new Map((d.data||[]).map(p=>[Number(p.id),p.image||'']));
+  let changed=false;
+  cart.forEach(i=>{const img=byId.get(Number(i.id));if(img!==undefined && i.image!==img){i.image=img;changed=true;}});
+  if(changed)localStorage.setItem('storeCart',JSON.stringify(cart));
+ }catch(e){}
+ render();
+}
+let cart=JSON.parse(localStorage.getItem('storeCart')||'[]');
+const money=v=>new Intl.NumberFormat('en-PH',{style:'currency',currency:'PHP'}).format(Number(v)||0);
+const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[c]));
+function save(){localStorage.setItem('storeCart',JSON.stringify(cart));render();}
+function render(){
+ const count=cart.reduce((n,i)=>n+Number(i.quantity),0),cc=document.getElementById('cartCount');if(cc)cc.textContent=count;
+ const root=document.getElementById('cartPage');if(!root)return;
+ if(!cart.length){root.innerHTML='<div class="empty-cart"><div class="empty-icon">🛒</div><h2>Your cart is empty</h2><p>Browse our furniture collection and add something you love.</p><a class="primary-btn" href="index.php#products">Start shopping →</a></div>';return;}
+ let subtotal=cart.reduce((n,i)=>n+Number(i.price)*Number(i.quantity),0);
+ root.innerHTML=`<div class="cart-layout"><section class="cart-list"><div class="cart-list-head"><b>${count} item${count===1?'':'s'}</b><button class="text-btn" id="clear">Clear cart</button></div>${cart.map((i,idx)=>`<article class="cart-item">${i.image ? `<img src="${esc(i.image)}" alt="${esc(i.name)}" onerror="this.style.display='none'">` : `<div class="cart-no-image">NO IMAGE</div>`}<div class="cart-item-info"><span class="category">Furniture</span><h3>${esc(i.name)}</h3><strong>${money(i.price)}</strong><button class="remove-btn" data-index="${idx}">Remove</button></div><div class="qty"><button data-action="minus" data-index="${idx}">−</button><span>${i.quantity}</span><button data-action="plus" data-index="${idx}">+</button></div><b class="line-total">${money(i.price*i.quantity)}</b></article>`).join('')}</section>
+ <aside class="summary"><h2>Order summary</h2><div><span>Subtotal</span><b>${money(subtotal)}</b></div><div><span>Delivery</span><b>Calculated at checkout</b></div><hr><div class="summary-total"><span>Total</span><strong>${money(subtotal)}</strong></div><a class="primary-btn full" href="checkout.php">Proceed to checkout →</a><a class="continue" href="index.php#products">← Continue shopping</a></aside></div>`;
+ document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>{let i=cart[+b.dataset.index];if(b.dataset.action==='plus')i.quantity++;else i.quantity=Math.max(1,i.quantity-1);save()});
+ document.querySelectorAll('.remove-btn').forEach(b=>b.onclick=()=>{cart.splice(+b.dataset.index,1);save()});
+ document.getElementById('clear').onclick=()=>{if(confirm('Clear all items from your cart?')){cart=[];save()}};
+}
+syncCartImages();

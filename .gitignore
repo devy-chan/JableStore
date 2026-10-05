@@ -1,0 +1,24 @@
+# XAMPP / local files
+*.log
+
+# Environment / secrets
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# Operating system
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+
+# PHP dependencies
+/vendor/
+
+# Node dependencies if used
+/node_modules/

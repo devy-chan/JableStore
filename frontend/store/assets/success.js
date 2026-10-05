@@ -1,0 +1,1 @@
+const order=JSON.parse(localStorage.getItem('lastOrder')||'null');if(order){document.getElementById('successText').textContent=`Order ${order.id} has been placed for ${new Intl.NumberFormat('en-PH',{style:'currency',currency:'PHP'}).format(order.total)}. Thank you, ${order.name}!`;}
