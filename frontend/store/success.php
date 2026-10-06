@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Order Complete | JABLE STORE</title><link rel="icon" type="image/png" href="../../logo5.png">
+<link rel="stylesheet" href="assets/store.css"></head>
+<body>
+<div class="announcement"><div class="container announcement-inner"><span>Clear pricing, real stock counts and an easy checkout — every visit to JABLE.</span><span>Furniture made for Filipino homes</span></div></div><header class="site-header"><div class="container nav"><a class="brand" href="index.php"><span class="brand-mark">J</span> JABLE STORE</a></div></header>
+<main class="container success-page"><div class="success-icon">✓</div><span class="eyebrow">ORDER RECEIVED</span><h1>Thank you for shopping with JABLE.</h1><p id="successText">Your order has been prepared successfully.</p><div class="success-actions"><a class="primary-btn" href="index.php">Continue shopping</a><a class="secondary-btn" href="cart.php">View cart</a></div></main><script src="assets/success.js"></script></body></html>
