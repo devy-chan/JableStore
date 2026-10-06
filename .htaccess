@@ -1,7 +1,0 @@
-# JABLE STORE - basic Apache security rules
-Options -Indexes
-
-# Block common project/development files from being downloaded.
-<FilesMatch "^(\.env|\.gitignore|PROJECT_STRUCTURE\.txt|DATATABLES_AJAX_FIX\.txt)$">
-    Require all denied
-</FilesMatch>

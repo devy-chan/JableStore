@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Furniture Details | JABLE STORE</title>
+<link rel="icon" type="image/png" href="logo5.png"><link rel="stylesheet" href="assets/store.css">
+</head>
+<body>
+<div class="announcement"><div class="container announcement-inner"><span>Clear pricing, real stock counts and an easy checkout — every visit to JABLE.</span><span>Furniture made for Filipino homes</span></div></div>
+<header class="site-header"><div class="container nav"><a class="brand" href="index.html"><span class="brand-mark">J</span> JABLE STORE</a><nav class="main-nav"><a href="index.html">Home</a><a class="active" href="index.html#products">Shop</a></nav><a class="cart-link" href="cart.html">🛒 <span>Cart</span><strong id="cartCount">0</strong></a></div></header>
+<main class="container page-space"><a class="continue" style="text-align:left;margin:0 0 20px" href="index.html#products">← Back to furniture</a><div id="detail"></div></main>
+<script src="assets/data.js"></script>
+<script>
+const params=new URLSearchParams(location.search);const productId=Number(params.get('id')||0);let cart=JSON.parse(localStorage.getItem('storeCart')||'[]');
+const money=v=>new Intl.NumberFormat('en-PH',{style:'currency',currency:'PHP'}).format(Number(v)||0);
+const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[c]));
+function count(){document.getElementById('cartCount').textContent=cart.reduce((n,i)=>n+Number(i.quantity||0),0)}
+const p=JABLE_PRODUCTS.find(x=>Number(x.id)===productId)||JABLE_PRODUCTS[0];
+if(p){document.getElementById('detail').innerHTML=`<div class="detail-card"><div class="detail-image">${p.image?`<img src="${esc(p.image)}" alt="${esc(p.name)}">`:`<div class="no-product-image"><span>NO IMAGE</span></div>`}</div><div class="detail-info"><div class="category">${esc(p.category)}</div><h1>${esc(p.name)}</h1><div class="brand-name">Brand: ${esc(p.brand)}</div><p class="detail-description">${esc(p.description)}</p><div class="detail-price">${money(p.price)}</div><div class="detail-facts"><div><span>Availability</span><b>✓ ${p.quantity} in stock</b></div><div><span>Category</span><b>${esc(p.category)}</b></div><div><span>Shopping</span><b>Add to cart anytime</b></div></div><div class="detail-note"><b>GitHub Pages demo</b><span>This demo stores your cart in your browser. A PHP/MySQL backend is required for real online orders.</span></div><button class="detail-btn" id="add">Add to cart</button><a class="secondary-btn" style="margin-top:10px" href="cart.html">View cart</a></div></div>`;
+document.getElementById('add').onclick=()=>{let f=cart.find(i=>i.id===p.id);if(f)f.quantity++;else cart.push({...p,quantity:1});localStorage.setItem('storeCart',JSON.stringify(cart));count();document.getElementById('add').textContent='Added to cart ✓';};}
+count();
+</script>
+</body></html>
